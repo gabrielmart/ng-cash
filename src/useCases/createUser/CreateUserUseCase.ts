@@ -1,21 +1,21 @@
 import { userRepository } from "../../repositories/userRepository";
 import { accountRepository } from "../../repositories/accountRepository";
-import { transactionRepository } from "../../repositories/transactionRepository";
 import { AppDataSource } from "../../AppDataSource";
 import bcrypt from "bcrypt";
-import User from "../../database/typeorm/entities/User";
 
-interface IUserRequest {
+interface ICreateUserRequest {
   username: string;
   password: string;
 }
 
 export default class CreateUserUseCase {
-  execute = async ({ username, password }: IUserRequest) => {
+  execute = async ({ username, password }: ICreateUserRequest) => {
     if (username.length < 3) {
       throw new Error("O nome do usuário deve ter pelo menos 3 caracteres!");
     }
 
+    /* Validates if password has at least 8 characters,
+     * which must contain a capital letter and a number */
     const regexValidatePassword = /(?=.*\d)(?=.*[A-Z]).{8,}/;
 
     if (!regexValidatePassword.test(password)) {
@@ -27,28 +27,30 @@ export default class CreateUserUseCase {
     const salt = await bcrypt.genSalt(12);
     const passwordHash = await bcrypt.hash(password, salt);
 
-    const existUser = await userRepository.findOne({
+    const userAlreadyExists = await userRepository.findOne({
       where: {
         username,
       },
     });
 
-    if (existUser) {
+    if (userAlreadyExists) {
       throw new Error("já existe usuário com esse nome!");
     }
 
-    await AppDataSource.transaction(async (transactionalEntityManager) => {
-      const account = accountRepository.create({ balance: 100 });
+    return await AppDataSource.transaction(
+      async (transactionalEntityManager) => {
+        const account = accountRepository.create({ balance: 100 });
 
-      await transactionalEntityManager.save(account);
+        await transactionalEntityManager.save(account);
 
-      const user = userRepository.create({
-        username,
-        password: passwordHash,
-        account,
-      });
+        const user = userRepository.create({
+          username,
+          password: passwordHash,
+          account,
+        });
 
-      return await transactionalEntityManager.save(user);
-    });
+        return await transactionalEntityManager.save(user);
+      }
+    );
   };
 }

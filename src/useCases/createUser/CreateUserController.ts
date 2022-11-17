@@ -8,8 +8,10 @@ export default class CreateUserController {
 
     const createUserUseCase = new CreateUserUseCase();
 
-    await createUserUseCase.execute({ username, password });
+    const newUser = await createUserUseCase.execute({ username, password });
 
-    response.status(201).json("Usuário cadastrado com sucesso!");
+    response
+      .status(201)
+      .json({ status: "Usuário cadastrado com sucesso!", user: newUser });
   }
 }
