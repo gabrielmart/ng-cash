@@ -3,8 +3,8 @@ import { NextFunction, Request, Response } from "express";
 export const HandlerErrors = (
   error: Error,
   request: Request,
-  respose: Response,
+  response: Response,
   next: NextFunction
 ) => {
-  respose.status(400).send(error.message);
+  response.status(400).send(error.message);
 };
