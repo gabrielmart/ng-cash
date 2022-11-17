@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
-export const HandleErrors = (
+export const HandlerErrors = (
   error: Error,
   request: Request,
   respose: Response,
