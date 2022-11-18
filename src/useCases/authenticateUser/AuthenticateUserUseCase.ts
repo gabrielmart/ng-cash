@@ -28,7 +28,7 @@ export default class AuthenticateUserUseCase {
     const SECRET = process.env.SECRET as string;
 
     const token = sign({}, SECRET, {
-      subject: userAlreadyExists.id.toString(),
+      subject: userAlreadyExists.username,
       expiresIn: "24h",
     });
 
