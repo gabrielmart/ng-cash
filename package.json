@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only ./src/app.ts",
     "debug": "ts-node-dev --files --transpile-only --respawn --inspect=4321 --project tsconfig.json src/app.ts",
-    "migration:generate": "typeorm-ts-node-commonjs -d ./src/AppDataSource.ts migration:generate ./src/migrations/default",
+    "migration:generate": "typeorm-ts-node-commonjs -d ./src/AppDataSource.ts migration:generate ./src/database/typeorm/migrations/default",
     "migration:run": "typeorm-ts-node-commonjs -d ./src/AppDataSource.ts migration:run"
   },
   "devDependencies": {
