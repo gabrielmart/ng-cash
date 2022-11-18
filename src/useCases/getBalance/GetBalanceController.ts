@@ -12,6 +12,6 @@ export default class GetBalanceController {
 
     response
       .status(201)
-      .json({ status: "Login realizado com sucesso!", balance });
+      .json({ status: "Valor atual do balance!", balance });
   }
 }
