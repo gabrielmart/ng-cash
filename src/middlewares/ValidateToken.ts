@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { verify } from "jsonwebtoken";
 
-export const HandlerErrors = (
+export const ValidateToken = (
   request: Request,
   response: Response,
   next: NextFunction
@@ -16,7 +16,9 @@ export const HandlerErrors = (
   const SECRET = process.env.SECRET as string;
 
   try {
-    verify(token, SECRET);
+    const decode = verify(token, SECRET);
+    
+    request.decode = decode;
 
     return next();
   } catch (error) {
