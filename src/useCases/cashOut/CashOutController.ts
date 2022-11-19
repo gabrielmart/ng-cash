@@ -16,7 +16,7 @@ export default class CashOutController {
     });
 
     response
-      .status(201)
+      .status(200)
       .json({ status: "Transação realizada com sucesso!", user: transaction });
   }
 }

@@ -21,6 +21,6 @@ export default class Transaction {
   @Column()
   value: number;
 
-  @CreateDateColumn()
+  @CreateDateColumn({type: "date"})
   createdAt: Date;
 }

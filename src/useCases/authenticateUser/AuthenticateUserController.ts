@@ -14,7 +14,7 @@ export default class AuthenticateUserController {
     });
 
     response
-      .status(201)
+      .status(200)
       .json({ status: "Login realizado com sucesso!", token });
   }
 }

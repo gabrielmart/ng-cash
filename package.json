@@ -7,6 +7,7 @@
     "dev": "ts-node-dev --respawn --transpile-only ./src/app.ts",
     "debug": "ts-node-dev --files --transpile-only --respawn --inspect=4321 --project tsconfig.json src/app.ts",
     "migration:generate": "typeorm-ts-node-commonjs -d ./src/AppDataSource.ts migration:generate ./src/database/typeorm/migrations/default",
+    "migration:revert": "typeorm-ts-node-commonjs -d ./src/AppDataSource.ts migration:revert",
     "migration:run": "typeorm-ts-node-commonjs -d ./src/AppDataSource.ts migration:run"
   },
   "devDependencies": {
@@ -18,6 +19,7 @@
   },
   "dependencies": {
     "bcrypt": "^5.1.0",
+    "dayjs": "^1.11.6",
     "express": "^4.18.2",
     "express-async-errors": "^3.1.1",
     "jsonwebtoken": "^8.5.1",

@@ -11,7 +11,7 @@ export default class GetBalanceController {
     const balance = await getBalanceUseCaseUseCase.execute({ decode });
 
     response
-      .status(201)
+      .status(200)
       .json({ status: "Valor atual do balance!", balance });
   }
 }
