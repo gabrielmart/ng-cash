@@ -1,11 +1,13 @@
 import {
   Column,
   Entity,
+  JoinColumn,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import Transaction from "./Transaction";
+import User from "./User";
 
 @Entity("Accounts")
 export default class Account {
@@ -14,6 +16,10 @@ export default class Account {
 
   @Column()
   balance: number;
+
+  @OneToOne(() => User)
+  @JoinColumn()
+  user: User;
 
   @OneToMany(
     () => Transaction,

@@ -18,21 +18,19 @@ interface IFilter {
 }
 
 export default class GetBalanceUseCase {
-  execute = async ({ decode, date = '', operation }: IGetTransactionRequest) => {
+  execute = async ({
+    decode,
+    date = "",
+    operation,
+  }: IGetTransactionRequest) => {
     const filters = {} as IFilter;
 
     dayjs.extend(customParseFormat);
 
-    const dateIsValid = dayjs(
-      date,
-      "DD-MM-YYYY",
-      true
-    ).isValid();
+    const dateIsValid = dayjs(date, "DD-MM-YYYY", true).isValid();
 
     if (date && !dateIsValid) {
-      throw new Error(
-        'Data invalida! Formatação esperada: "21-09-1999"'
-      );
+      throw new Error('Data invalida! Formatação esperada: "21-09-1999"');
     }
 
     if (dateIsValid) {
@@ -69,10 +67,12 @@ export default class GetBalanceUseCase {
       filters.creditedAccount = user.account;
     }
 
-    const transctions = await transactionRepository.find({
-      where: filters,
-    });
+    const transactions = await transactionRepository
+      .createQueryBuilder("transaction")
+      .leftJoinAndSelect("transaction.debitedAccount", "account")
+      .leftJoinAndSelect("account.user", "user")
+      .getOne();
 
-    return transctions;
+    return transactions;
   };
 }

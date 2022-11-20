@@ -16,7 +16,7 @@ export default class User {
   @PrimaryColumn()
   username: string;
 
-  @Column()
+  @Column({select: false})
   password: string;
 
   @OneToOne(() => Account)

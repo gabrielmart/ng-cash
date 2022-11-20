@@ -44,7 +44,7 @@ export default class CreateUserUseCase {
 
     const payerUser = await userRepository.findOne({
       where: { username },
-      relations: { account: true },
+      relations: { account: { user: true} },
     });
 
     if (!payerUser) {
@@ -59,7 +59,7 @@ export default class CreateUserUseCase {
 
     const recipientUser = await userRepository.findOne({
       where: { username: recipientUsername },
-      relations: { account: true },
+      relations: { account: { user: true } },
     });
 
     if (!recipientUser) {

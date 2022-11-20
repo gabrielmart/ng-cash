@@ -2,6 +2,7 @@ import { userRepository } from "../../repositories/userRepository";
 import { accountRepository } from "../../repositories/accountRepository";
 import { AppDataSource } from "../../AppDataSource";
 import bcrypt from "bcrypt";
+import Account from "../../database/typeorm/entities/Account";
 
 interface ICreateUserRequest {
   username: string;
@@ -44,13 +45,17 @@ export default class CreateUserUseCase {
 
         await transactionalEntityManager.save(account);
 
-        const user = userRepository.create({
+        let  user = userRepository.create({
           username,
           password: passwordHash,
           account,
         });
 
-        return await transactionalEntityManager.save(user);
+        user = await transactionalEntityManager.save(user);
+
+        await transactionalEntityManager.update(Account, account, {user})
+
+        return user
       }
     );
   };
