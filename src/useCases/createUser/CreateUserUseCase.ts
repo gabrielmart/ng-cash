@@ -39,7 +39,8 @@ export default class CreateUserUseCase {
 
     return await AppDataSource.transaction(
       async (transactionalEntityManager) => {
-        const account = accountRepository.create({ balance: 100 });
+        // The value passed to the balance is multiplied by 100, turning the smallest unit of the real currency (cents) into an integer, avoiding floating point errors in javascript
+        const account = accountRepository.create({ balance: 10000 });
 
         await transactionalEntityManager.save(account);
 

@@ -24,6 +24,24 @@ export default class CreateUserUseCase {
       );
     }
 
+    if (value.toString().includes(",")) {
+      throw new Error(
+        'Por favor informar valor usando ponto (".") ao invés de virgula (",")'
+      );
+    }
+
+    // Checks if is number and the number has at most two decimal places - MONETARY VALUE
+    const validateTwoPlaceDecimal = /^\d+(\.\d{1,2})?$/;
+
+    if (!validateTwoPlaceDecimal.test(value.toString())) {
+      throw new Error(
+        'Por favor informar valor valido com no maximo duas casas decimais. Formatos esperados: "10", "10.1", "10.01"'
+      );
+    }
+
+    // Multiplying the number by 100, facilitates operations, avoiding errors requiring javascript - MONETARY VALUE
+    const convertedValue = parseInt((value * 100).toFixed(0));
+
     const payerUser = await userRepository.findOne({
       where: { username },
       relations: { account: true },
@@ -33,7 +51,7 @@ export default class CreateUserUseCase {
       throw new Error("Não foi possível encontrar o usuário pagador!");
     }
 
-    if (payerUser.account.balance < value) {
+    if (payerUser.account.balance < convertedValue) {
       throw new Error(
         "Usuário pagador não possui saldo disponível para realizar transação!"
       );
@@ -54,8 +72,8 @@ export default class CreateUserUseCase {
       );
     }
 
-    payerUser.account.balance -= value;
-    recipientUser.account.balance += value;
+    payerUser.account.balance -= convertedValue;
+    recipientUser.account.balance += convertedValue;
 
     return await AppDataSource.transaction(
       async (transactionalEntityManager) => {
@@ -65,7 +83,7 @@ export default class CreateUserUseCase {
         const transaction = transactionRepository.create({
           debitedAccount: payerUser.account,
           creditedAccount: recipientUser.account,
-          value,
+          value: convertedValue,
         });
 
         return await transactionalEntityManager.save(transaction);
