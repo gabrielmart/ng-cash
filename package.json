@@ -1,11 +1,18 @@
 {
-  "name": "ng-cash",
+  "name": "ng-cash-out",
+  "description": "Cash-out Transaction API for NG Cash Internal Users built with Node.js and Typescript",
   "version": "1.0.0",
-  "main": "app.ts",
+  "author": "Gabriel Martins",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gabrielmart/ng-cash"
+  },
+  "main": "app.js",
   "license": "MIT",
   "scripts": {
+    "build": "tsc",
+    "start": "yarn build && node dist/app.js",
     "dev": "ts-node-dev --respawn --transpile-only ./src/app.ts",
-    "debug": "ts-node-dev --files --transpile-only --respawn --inspect=4321 --project tsconfig.json src/app.ts",
     "migration:generate": "typeorm-ts-node-commonjs -d ./src/AppDataSource.ts migration:generate ./src/database/typeorm/migrations/default",
     "migration:revert": "typeorm-ts-node-commonjs -d ./src/AppDataSource.ts migration:revert",
     "migration:run": "typeorm-ts-node-commonjs -d ./src/AppDataSource.ts migration:run"
@@ -20,6 +27,7 @@
   "dependencies": {
     "bcrypt": "^5.1.0",
     "dayjs": "^1.11.6",
+    "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-async-errors": "^3.1.1",
     "jsonwebtoken": "^8.5.1",
