@@ -18,9 +18,14 @@ export default class Transaction {
   @ManyToOne(() => Account, (account) => account.transactions)
   creditedAccount: Account;
 
-  @Column()
+  @Column({
+    transformer: {
+      from: (value) => value / 100,
+      to: (value) => value
+    },
+  })
   value: number;
 
-  @CreateDateColumn({type: "date"})
+  @CreateDateColumn({ type: "date" })
   createdAt: Date;
 }

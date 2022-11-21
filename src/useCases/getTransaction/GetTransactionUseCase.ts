@@ -16,6 +16,10 @@ interface IFilter {
   debitedAccount?: Account;
   creditedAccount?: Account;
 }
+interface IRelation {
+  debitedAccount?: { user: boolean };
+  creditedAccount?: { user: boolean };
+}
 
 export default class GetBalanceUseCase {
   execute = async ({
@@ -24,6 +28,14 @@ export default class GetBalanceUseCase {
     operation,
   }: IGetTransactionRequest) => {
     const filters = {} as IFilter;
+    const relations = {} as IRelation;
+    const filterWithAllOperations = [];
+
+    if (!date && !operation) {
+      throw new Error(
+        'Adicione pelo um filtro para obter as transações. Filtros disponíveis: "operation" e "date"'
+      );
+    }
 
     dayjs.extend(customParseFormat);
 
@@ -35,12 +47,6 @@ export default class GetBalanceUseCase {
 
     if (dateIsValid) {
       filters.createdAt = dayjs(date, "DD-MM-YYYY").toDate();
-    }
-
-    if (operation !== "cash-out" && operation !== "cash-in") {
-      throw new Error(
-        'Operação Invalida! Opções validas: "cash-in" ou "cash-out"'
-      );
     }
 
     const { sub } = decode;
@@ -59,19 +65,38 @@ export default class GetBalanceUseCase {
       throw new Error("Erro ao obter as transações");
     }
 
-    if (operation === "cash-out") {
-      filters.debitedAccount = user.account;
+    if (!date && operation !== "cash-out" && operation !== "cash-in") {
+      throw new Error(
+        'Operação Invalida! Opções validas: "cash-in" ou "cash-out"'
+      );
     }
 
-    if (operation === "cash-in") {
-      filters.creditedAccount = user.account;
+    switch (operation) {
+      case "cash-out":
+        filters.debitedAccount = user.account;
+        relations.debitedAccount = { user: true };
+        break;
+
+      case "cash-in":
+        filters.creditedAccount = user.account;
+        relations.creditedAccount = { user: true };
+        break;
+
+      default:
+        filterWithAllOperations.push(
+          { creditedAccount: user.account },
+          { debitedAccount: user.account }
+        );
+
+        relations.creditedAccount = { user: true };
+        relations.debitedAccount = { user: true };
+        break;
     }
 
-    const transactions = await transactionRepository
-      .createQueryBuilder("transaction")
-      .leftJoinAndSelect("transaction.debitedAccount", "account")
-      .leftJoinAndSelect("account.user", "user")
-      .getOne();
+    const transactions = await transactionRepository.find({
+      where: filters ? filters : filterWithAllOperations,
+      relations: relations,
+    });
 
     return transactions;
   };
