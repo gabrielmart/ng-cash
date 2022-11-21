@@ -55,6 +55,8 @@ export default class CreateUserUseCase {
 
         await transactionalEntityManager.update(Account, account, {user})
 
+        user.account.balance /= 100
+
         return user
       }
     );

@@ -2,6 +2,7 @@ import { JwtPayload } from "jsonwebtoken";
 import { userRepository } from "../../repositories/userRepository";
 import { transactionRepository } from "../../repositories/transactionRepository";
 import { AppDataSource } from "../../AppDataSource";
+import { accountRepository } from "../../repositories/accountRepository";
 
 interface ICashOutRequest {
   recipientUsername: string;
@@ -44,14 +45,26 @@ export default class CreateUserUseCase {
 
     const payerUser = await userRepository.findOne({
       where: { username },
-      relations: { account: { user: true} },
+      relations: {
+        account: { user: true },
+      },
     });
 
     if (!payerUser) {
       throw new Error("Não foi possível encontrar o usuário pagador!");
     }
 
-    if (payerUser.account.balance < convertedValue) {
+    const payerAccount = await accountRepository
+      .createQueryBuilder("account")
+      .addSelect("account.balance")
+      .where(payerUser.account)
+      .getOne();
+
+    if (!payerAccount) {
+      throw new Error("Erro ao obter a conta do usuário pagador");
+    }
+
+    if (payerAccount.balance < convertedValue) {
       throw new Error(
         "Usuário pagador não possui saldo disponível para realizar transação!"
       );
@@ -59,7 +72,9 @@ export default class CreateUserUseCase {
 
     const recipientUser = await userRepository.findOne({
       where: { username: recipientUsername },
-      relations: { account: { user: true } },
+      relations: {
+        account: { user: true },
+      },
     });
 
     if (!recipientUser) {
@@ -72,13 +87,23 @@ export default class CreateUserUseCase {
       );
     }
 
-    payerUser.account.balance -= convertedValue;
-    recipientUser.account.balance += convertedValue;
+    const recipientAccount = await accountRepository
+      .createQueryBuilder("account")
+      .addSelect("account.balance")
+      .where(recipientUser.account)
+      .getOne();
 
-    return await AppDataSource.transaction(
+    if (!recipientAccount) {
+      throw new Error("Erro ao obter a conta do usuário pagador");
+    }
+
+    payerAccount.balance -= convertedValue;
+    recipientAccount.balance += convertedValue;
+
+    const transaction = await AppDataSource.transaction(
       async (transactionalEntityManager) => {
-        await transactionalEntityManager.save(payerUser.account);
-        await transactionalEntityManager.save(recipientUser.account);
+        await transactionalEntityManager.save(payerAccount);
+        await transactionalEntityManager.save(recipientAccount);
 
         const transaction = transactionRepository.create({
           debitedAccount: payerUser.account,
@@ -89,5 +114,9 @@ export default class CreateUserUseCase {
         return await transactionalEntityManager.save(transaction);
       }
     );
+
+    transaction.value /= 100;
+
+    return transaction;
   };
 }

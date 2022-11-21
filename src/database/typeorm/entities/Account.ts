@@ -14,7 +14,7 @@ export default class Account {
   @PrimaryGeneratedColumn("uuid")
   id: number;
 
-  @Column()
+  @Column({ select: false })
   balance: number;
 
   @OneToOne(() => User)

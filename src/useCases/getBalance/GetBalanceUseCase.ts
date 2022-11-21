@@ -1,4 +1,5 @@
 import { JwtPayload } from "jsonwebtoken";
+import { accountRepository } from "../../repositories/accountRepository";
 import { userRepository } from "../../repositories/userRepository";
 
 interface IGetBalanceRequest {
@@ -14,17 +15,27 @@ export default class GetBalanceUseCase {
       where: {
         username,
       },
-      relations: {
-        account: true,
-      },
+      loadRelationIds: true,
     });
 
     if (!user) {
-      throw new Error("Erro ao obter balance");
+      throw new Error("Erro ao obter o usuário");
     }
 
-    const balance = user.account.balance;
+    console.log(user);
 
-    return balance;
+    const account = await accountRepository
+      .createQueryBuilder("account")
+      .addSelect("account.balance")
+      .where({ id: user.account })
+      .getOne();
+
+    if (!account) {
+      throw new Error("Erro ao obter a conta");
+    }
+
+    const balance = account.balance;
+
+    return balance / 100;
   };
 }

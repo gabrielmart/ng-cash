@@ -16,11 +16,6 @@ interface IFilter {
   debitedAccount?: Account;
   creditedAccount?: Account;
 }
-interface IRelation {
-  debitedAccount?: { user: boolean };
-  creditedAccount?: { user: boolean };
-}
-
 export default class GetBalanceUseCase {
   execute = async ({
     decode,
@@ -28,7 +23,6 @@ export default class GetBalanceUseCase {
     operation,
   }: IGetTransactionRequest) => {
     const filters = {} as IFilter;
-    const relations = {} as IRelation;
     const filterWithAllOperations = [];
 
     if (!date && !operation) {
@@ -74,12 +68,10 @@ export default class GetBalanceUseCase {
     switch (operation) {
       case "cash-out":
         filters.debitedAccount = user.account;
-        relations.debitedAccount = { user: true };
         break;
 
       case "cash-in":
         filters.creditedAccount = user.account;
-        relations.creditedAccount = { user: true };
         break;
 
       default:
@@ -87,15 +79,15 @@ export default class GetBalanceUseCase {
           { creditedAccount: user.account },
           { debitedAccount: user.account }
         );
-
-        relations.creditedAccount = { user: true };
-        relations.debitedAccount = { user: true };
         break;
     }
 
     const transactions = await transactionRepository.find({
       where: filters ? filters : filterWithAllOperations,
-      relations: relations,
+      relations: {
+        debitedAccount: { user: true },
+        creditedAccount: { user: true },
+      },
     });
 
     return transactions;
