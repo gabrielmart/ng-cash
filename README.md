@@ -8,7 +8,7 @@ Esta API tem como objetivo possibilitar que os usuários da NG Cash consigam:
 
 - Realizar transações entre sí
 - Verificar seu balance atual
-- Visualizar todas a transações no qual seu usuário participou. Podendo filtrar pelo tipo de operação (cash-out ou cash-in) e data na qual a transação foi realizada
+- Visualizar todas a transações no qual seu usuário participou. Podendo filtrar pelo tipo de operação (cash-out ou cash-in) e/ou data na qual a transação foi realizada
 
 ## Pré-Requisitos
 
@@ -103,6 +103,7 @@ docker compose run app_node yarn migration:run
 
 ## Rotas da aplicação
 Todas essas rotas podem ser consumidas através da url: `localhost:3000`.
+
 Para facilitar o consumo da API, importe o arquivo `ng_cash_out.postman_collection.json` no Postman.
 
 ### Rotas com Sem Autenticação
@@ -132,6 +133,10 @@ Para facilitar o consumo da API, importe o arquivo `ng_cash_out.postman_collecti
 
 ### Rotas com Autenticação
 Todas as rotas a seguir utilizam o header `Authorization`, do tipo `Bearer Token`, **utilizar token gerado no login.**
+
+**OBS:** Adicionar token gerado no login, na variável `token` da collection `ng_cash-out` 
+
+![Imagem da tela do postman para adicionar a variavel token]("./assets/variaveis_collection.png")
 
 #### Obter Balance:
 `Get` em `/balance`, não possui corpo.
