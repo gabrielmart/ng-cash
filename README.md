@@ -136,7 +136,7 @@ Todas as rotas a seguir utilizam o header `Authorization`, do tipo `Bearer Token
 
 **OBS:** Adicionar token gerado no login, na variável `token` da collection `ng_cash-out` 
 
-![Imagem da tela do postman para adicionar a variavel token]("./assets/variaveis_collection.png")
+![Imagem da tela do postman para adicionar a variavel token](./assets/variaveis_collection.png)
 
 #### Obter Balance:
 `Get` em `/balance`, não possui corpo.
