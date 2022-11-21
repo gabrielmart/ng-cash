@@ -159,11 +159,11 @@ Todas as rotas a seguir utilizam o header `Authorization`, do tipo `Bearer Token
 
 ```json
 {
-    "operation": "cash-out", // Tipo da operação, podendo ser "cash-out" ou "cash-in"
+    "operation": "cash-out", // Tipo da operação. É um parametro opcional, podendo ser "cash-out" ou "cash-in"
     "date": "20-11-2022" // Data de realização da transação. É um parametro opcional, que deve conter o formato "DD-MM-AAAA".
 }
 ```
-**OBS:** Caso nenhuma data seja passada, serão obtidas todas as transações realizadas do tipo informado.
+**OBS:** É necessário passar pelo um filtro para obter as transações. Filtros disponíveis: "operation" e "date"
 
 ---
 
